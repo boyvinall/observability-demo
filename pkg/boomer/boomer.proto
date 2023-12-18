@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package boomer;
+option go_package = "github.com/boyvinall/go-observability-app/pkg/boomer/";
+
+message BoomRequest {
+  string name = 1;
+}
+
+message BoomResponse {
+  string message = 1;
+}
+
+service Boomer {
+  rpc Boom(BoomRequest) returns (BoomResponse) {}
+}
