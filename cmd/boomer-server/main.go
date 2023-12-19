@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	cli "github.com/urfave/cli/v2"
@@ -20,20 +21,30 @@ import (
 	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.21.0"
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
 	"github.com/boyvinall/go-observability-app/pkg/server"
+	"github.com/boyvinall/go-observability-app/pkg/tracelog"
 )
 
-func serveMetrics() {
+func serveMetrics() error {
 	log.Printf("serving metrics at localhost:2223/metrics")
-	http.Handle("/metrics", promhttp.Handler())
-	err := http.ListenAndServe("0.0.0.0:2223", nil) //nolint:gosec // Ignoring G114: Use of net/http serve function that has no support for setting timeouts.
-	if err != nil {
-		fmt.Printf("error serving http: %v", err)
-		return
+
+	mux := http.NewServeMux()
+	mux.Handle("/metrics", promhttp.Handler())
+	metricServer := &http.Server{
+		Addr:              "0.0.0.0:2223",
+		ReadHeaderTimeout: 3 * time.Second, // fix for gosec G114
+		Handler:           mux,
 	}
+	err := metricServer.ListenAndServe()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func run(address string) error {
@@ -46,10 +57,13 @@ func run(address string) error {
 			semconv.ServiceVersion("0.0.0"),
 		),
 	)
+	if err != nil {
+		return fmt.Errorf("failed to create resource: %w", err)
+	}
 
 	promexp, err := prometheus.New()
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("failed to initialize prometheus exporter: %w", err)
 	}
 	mp := metric.NewMeterProvider(
 		metric.WithReader(promexp),
@@ -63,7 +77,7 @@ func run(address string) error {
 		otlptracegrpc.WithHeaders(map[string]string{"x-scope-orgid": "1"}),
 	)
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("failed to create exporter: %w", err)
 	}
 
 	tp := trace.NewTracerProvider(
@@ -73,29 +87,35 @@ func run(address string) error {
 	)
 	otel.SetTracerProvider(tp)
 
+	logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
+
 	// Start the prometheus HTTP server and pass the exporter Collector to it
-	go serveMetrics()
+	eg := errgroup.Group{}
+	eg.Go(serveMetrics)
 
 	// create the GRPC server first so that services can register themselves to it
 	grpcServer := grpc.NewServer(
 		grpc.StatsHandler(otelgrpc.NewServerHandler()),
+		grpc.ChainUnaryInterceptor(
+			tracelog.UnaryServerInterceptor(logger),
+			// Add any other interceptor you want.
+		),
 	)
 
 	_, err = server.New(grpcServer)
 	if err != nil {
-		slog.Error("failed to create server", "error", err)
-		return err
+		return fmt.Errorf("failed to create server: %w", err)
 	}
 
 	slog.Info("Listening", "address", address)
 	lis, err := net.Listen("tcp", address)
 	if err != nil {
-		slog.Error("failed to listen", "error", err)
-		return err
+		return fmt.Errorf("failed to listen: %w", err)
 	}
 
 	reflection.Register(grpcServer)
-	return grpcServer.Serve(lis)
+	eg.Go(func() error { return grpcServer.Serve(lis) })
+	return eg.Wait()
 }
 
 func main() {
