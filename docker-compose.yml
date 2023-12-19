@@ -1,0 +1,60 @@
+# taken from https://github.com/grafana/tempo/tree/main/example/docker-compose/local
+
+version: "3"
+
+volumes:
+  tempo-data:
+  prometheus-data:
+
+services:
+
+  tempo:
+    container_name: tempo
+    image: grafana/tempo:2.3.1
+    command: [ "-config.file=/etc/tempo.yml" ]
+    volumes:
+      - ./docker/tempo.yml:/etc/tempo.yml
+      - tempo-data:/data
+    ports:
+      - "3200:3200"  # tempo
+      - "9095:9095"  # tempo grpc
+      - "4317:4317"  # otlp grpc
+      - "4318:4318"  # otlp http
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:v2.48.1
+    command:
+      - --config.file=/etc/prometheus.yml
+      - --web.enable-remote-write-receiver  # so tempo can write generated metrics
+      - --enable-feature=exemplar-storage
+      # - --storage.tsdb.path=/data
+    volumes:
+      - ./docker/prometheus.yml:/etc/prometheus.yml
+      # - prometheus-data:/data
+    ports:
+      - "9090:9090"
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:10.2.3
+    volumes:
+      - ./docker/grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yaml
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+      - GF_FEATURE_TOGGLES_ENABLE=traceqlEditor traceQLStreaming metricsSummary
+    ports:
+      - "3000:3000"
+
+  boomer:
+    container_name: boomer
+    image: boomer
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+      - "2223:2223"

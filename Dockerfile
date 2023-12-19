@@ -6,3 +6,13 @@ RUN \
   unzip /tmp/protoc.zip -d /usr/local
 RUN apk add --no-cache make
 
+COPY tools.go go.mod go.sum Makefile /app/
+RUN make install-tools
+
+COPY . /app/
+RUN make build
+
+FROM --platform=amd64 alpine:3.14.2
+RUN apk add --no-cache ca-certificates
+COPY --from=builder /app/bin/boomer /boomer
+ENTRYPOINT [ "/boomer" ]

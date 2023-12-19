@@ -52,3 +52,18 @@ lint:
 %.pb.go: %.proto Makefile
 	$(call PROMPT,$@)
 	protoc --go_out=paths=source_relative:. $<
+
+.PHONY: start
+start:
+	$(call PROMPT,$@)
+	docker compose up -d --build --remove-orphans
+
+.PHONY: stop
+stop:
+	$(call PROMPT,$@)
+	docker compose down -v --remove-orphans
+
+.PHONY: run-client
+run-client:
+	$(call PROMPT,$@)
+	go run ./cmd/boomer-cli/main.go
