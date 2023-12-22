@@ -8,6 +8,7 @@ import (
 	"context"
 	"log/slog"
 
+	"github.com/go-logr/logr"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 )
@@ -43,4 +44,10 @@ func LoggerFromContext(ctx context.Context) *slog.Logger {
 		logger = logger.With("span_id", spanContext.SpanID().String())
 	}
 	return logger
+}
+
+// LogrFromSlog returns a logr.Logger from a slog.Logger
+// This is useful for setting up the opentelemetry logger, which uses logr.
+func LogrFromSlog(logger *slog.Logger) logr.Logger {
+	return logr.FromSlogHandler(logger.Handler())
 }

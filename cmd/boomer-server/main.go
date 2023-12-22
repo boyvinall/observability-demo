@@ -54,6 +54,7 @@ func run(address string) error {
 		With("hostname", hostName).
 		With("service_name", serviceName)
 	slog.SetDefault(logger)
+	otel.SetLogger(logutil.LogrFromSlog(logger))
 
 	ctx := context.Background()
 	r, err := resource.Merge(

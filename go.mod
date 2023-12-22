@@ -3,6 +3,7 @@ module github.com/boyvinall/go-observability-app
 go 1.21.0
 
 require (
+	github.com/go-logr/logr v1.4.1
 	github.com/golangci/golangci-lint v1.55.2
 	github.com/prometheus/client_golang v1.17.0
 	github.com/urfave/cli/v2 v2.26.0
@@ -66,7 +67,6 @@ require (
 	github.com/fzipp/gocyclo v0.6.0 // indirect
 	github.com/ghostiam/protogetter v0.2.3 // indirect
 	github.com/go-critic/go-critic v0.9.0 // indirect
-	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-toolsmith/astcast v1.1.0 // indirect
 	github.com/go-toolsmith/astcopy v1.1.0 // indirect
