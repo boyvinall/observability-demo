@@ -9,7 +9,7 @@ define PROMPT
 endef
 
 .PHONY: all # Default target - run lint and build
-all: lint build
+all: lint docker-build start
 
 GRPC_PROTO=\
 	pkg/boomer/boomer.proto

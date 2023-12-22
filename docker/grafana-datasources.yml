@@ -37,6 +37,15 @@ datasources:
   uid: tempo
   jsonData:
     httpMethod: GET
+    serviceMap: # This enables the "service graph" tab on the tempo explore page
+      datasourceUid: 'prometheus'
+    lokiSearch: # This enables the "loki search" tab on the tempo explore page
+      datasourceUid: 'loki'
+    nodeGraph: # This enables the "node graph" panel when viewing a trace
+      enabled: true
+    search:
+      hide: false
+
     tracesToLogsV2:
       datasourceUid: loki
       spanStartTimeShift: '-10m'
@@ -47,8 +56,12 @@ datasources:
       tags:
         - { key: 'service.name', value: 'service_name' }
       query: '{app="boomer"} | logfmt |= "$${__span.traceId}"'
+
+      # both of these result in grafana failing to link to the logs
+      #
       # query: '{app="boomer"} | logfmt | service_name="$${__span.tags.service_name}" |= "$${__span.traceId}"'
       # query: '{app="boomer"} | logfmt | service_name="$${service_name}" | trace_id="$${__span.traceId}"'
+
     tracesToMetrics:
       datasourceUid: 'prometheus'
       spanStartTimeShift: '-1h'
@@ -63,15 +76,6 @@ datasources:
         # - You can quite easily set a breakpoint on that function in your browser
         - name: 'count/2min'
           query: 'increase(traces_spanmetrics_calls_total{$$__tags}[2m])'
-
-    serviceMap: # This enables the "service graph" tab on the tempo explore page
-      datasourceUid: 'prometheus'
-    lokiSearch: # This enables the "loki search" tab on the tempo explore page
-      datasourceUid: 'loki'
-    nodeGraph: # This enables the "node graph" panel when viewing a trace
-      enabled: true
-    search:
-      hide: false
 
 - name: Loki
   type: loki

@@ -1,4 +1,4 @@
-# developed from https://github.com/grafana/tempo/tree/main/example/docker-compose/local
+# some parts originally taken from https://github.com/grafana/tempo/tree/main/example/docker-compose/local
 
 version: "3"
 
@@ -24,8 +24,8 @@ services:
 
   loki:
     container_name: loki
-    # image: grafana/loki:2.8.7
-    image: grafana/loki:main
+    image: grafana/loki:2.8.7
+    # image: grafana/loki:main
     command: [ "-config.file=/etc/loki/loki.yml" ]
     volumes:
       - ./docker/loki.yml:/etc/loki/loki.yml
@@ -39,8 +39,8 @@ services:
 
   tempo:
     container_name: tempo
-    # image: grafana/tempo:2.3.1
-    image: grafana/tempo:latest
+    image: grafana/tempo:2.3.1
+    # image: grafana/tempo:latest
     command: [ "-config.file=/etc/tempo.yml" ]
     volumes:
       - ./docker/tempo.yml:/etc/tempo.yml
@@ -71,8 +71,8 @@ services:
 
   grafana:
     container_name: grafana
-    # image: grafana/grafana:10.2.3
-    image: grafana/grafana:main
+    image: grafana/grafana:10.2.3
+    # image: grafana/grafana:main
     volumes:
       - ./docker/grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yaml
     environment:

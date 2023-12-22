@@ -28,35 +28,37 @@ import (
 	"github.com/boyvinall/go-observability-app/pkg/logutil"
 )
 
-func serveMetrics() error {
-	slog.Info("serving metrics", "address", "localhost:2223/metrics")
-
-	mux := http.NewServeMux()
-	mux.Handle("/metrics", promhttp.Handler())
-	metricServer := &http.Server{
-		Addr:              "0.0.0.0:2223",
-		ReadHeaderTimeout: 3 * time.Second, // fix for gosec G114
-		Handler:           mux,
-	}
-	err := metricServer.ListenAndServe()
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
+//nolint:funlen
 func run(address string) error {
 	hostName := os.Getenv("HOSTNAME")
 	serviceName := "MyBoomerServer"
 
-	logger := slog.New(slog.NewTextHandler(os.Stderr, nil)).
+	ctx := context.Background()
+	g := errgroup.Group{}
+
+	//--------------------------------------------------
+	//
+	//  set up the logger
+	//
+	//   - do this before creating any other objects
+	//     so that other constructors can use it
+	//
+	//--------------------------------------------------
+
+	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug})).
 		With("hostname", hostName).
 		With("service_name", serviceName)
 	slog.SetDefault(logger)
 	otel.SetLogger(logutil.LogrFromSlog(logger))
 
-	ctx := context.Background()
+	//--------------------------------------------------
+	//
+	//  create the resource
+	//
+	//  - this is used by metrics and traces
+	//
+	//--------------------------------------------------
+
 	r, err := resource.Merge(
 		resource.Default(),
 		resource.NewWithAttributes(
@@ -70,6 +72,12 @@ func run(address string) error {
 		return fmt.Errorf("failed to create resource: %w", err)
 	}
 
+	//--------------------------------------------------
+	//
+	//  metrics
+	//
+	//--------------------------------------------------
+
 	promexp, err := prometheus.New()
 	if err != nil {
 		return fmt.Errorf("failed to initialize prometheus exporter: %w", err)
@@ -79,6 +87,26 @@ func run(address string) error {
 		metric.WithResource(r),
 	)
 	otel.SetMeterProvider(mp)
+
+	// Start the prometheus HTTP server
+	g.Go(func() error {
+		slog.Info("serving metrics", "address", "localhost:2223/metrics")
+
+		mux := http.NewServeMux()
+		mux.Handle("/metrics", promhttp.Handler())
+		metricServer := &http.Server{
+			Addr:              "0.0.0.0:2223",
+			ReadHeaderTimeout: 3 * time.Second, // fix for gosec G114
+			Handler:           mux,
+		}
+		return metricServer.ListenAndServe()
+	})
+
+	//--------------------------------------------------
+	//
+	//  traces
+	//
+	//--------------------------------------------------
 
 	exp, err := otlptracegrpc.New(ctx,
 		otlptracegrpc.WithEndpoint("tempo:4317"),
@@ -96,19 +124,23 @@ func run(address string) error {
 	)
 	otel.SetTracerProvider(tp)
 
-	// Start the prometheus HTTP server and pass the exporter Collector to it
-	eg := errgroup.Group{}
-	eg.Go(serveMetrics)
+	//--------------------------------------------------
+	//
+	//  set up the app
+	//
+	//--------------------------------------------------
 
 	// create the GRPC server first so that services can register themselves to it
 	grpcServer := grpc.NewServer(
 		grpc.StatsHandler(otelgrpc.NewServerHandler()),
 		grpc.ChainUnaryInterceptor(
 			logutil.UnaryServerInterceptor(logger),
-			// Add any other interceptor you want.
+			// Add any other interceptor you want
 		),
 	)
+	reflection.Register(grpcServer)
 
+	// create the server
 	_, err = boomerserver.New(grpcServer)
 	if err != nil {
 		return fmt.Errorf("failed to create server: %w", err)
@@ -120,9 +152,18 @@ func run(address string) error {
 		return fmt.Errorf("failed to listen: %w", err)
 	}
 
-	reflection.Register(grpcServer)
-	eg.Go(func() error { return grpcServer.Serve(lis) })
-	return eg.Wait()
+	// start the GRPC server
+	g.Go(func() error {
+		return grpcServer.Serve(lis)
+	})
+
+	//--------------------------------------------------
+	//
+	//  wait for the app to exit
+	//
+	//--------------------------------------------------
+
+	return g.Wait()
 }
 
 func main() {
