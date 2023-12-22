@@ -4,7 +4,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"log/slog"
 	"net"
 	"net/http"
@@ -25,12 +24,12 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
-	"github.com/boyvinall/go-observability-app/pkg/server"
-	"github.com/boyvinall/go-observability-app/pkg/tracelog"
+	"github.com/boyvinall/go-observability-app/pkg/boomerserver"
+	"github.com/boyvinall/go-observability-app/pkg/logutil"
 )
 
 func serveMetrics() error {
-	log.Printf("serving metrics at localhost:2223/metrics")
+	slog.Info("serving metrics", "address", "localhost:2223/metrics")
 
 	mux := http.NewServeMux()
 	mux.Handle("/metrics", promhttp.Handler())
@@ -48,12 +47,21 @@ func serveMetrics() error {
 }
 
 func run(address string) error {
+	hostName := os.Getenv("HOSTNAME")
+	serviceName := "MyBoomerServer"
+
+	logger := slog.New(slog.NewTextHandler(os.Stderr, nil)).
+		With("hostname", hostName).
+		With("service_name", serviceName)
+	slog.SetDefault(logger)
+
 	ctx := context.Background()
 	r, err := resource.Merge(
 		resource.Default(),
 		resource.NewWithAttributes(
 			semconv.SchemaURL,
-			semconv.ServiceName("MyBoomerServer"),
+			semconv.HostName(hostName),
+			semconv.ServiceName(serviceName),
 			semconv.ServiceVersion("0.0.0"),
 		),
 	)
@@ -87,8 +95,6 @@ func run(address string) error {
 	)
 	otel.SetTracerProvider(tp)
 
-	logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
-
 	// Start the prometheus HTTP server and pass the exporter Collector to it
 	eg := errgroup.Group{}
 	eg.Go(serveMetrics)
@@ -97,17 +103,17 @@ func run(address string) error {
 	grpcServer := grpc.NewServer(
 		grpc.StatsHandler(otelgrpc.NewServerHandler()),
 		grpc.ChainUnaryInterceptor(
-			tracelog.UnaryServerInterceptor(logger),
+			logutil.UnaryServerInterceptor(logger),
 			// Add any other interceptor you want.
 		),
 	)
 
-	_, err = server.New(grpcServer)
+	_, err = boomerserver.New(grpcServer)
 	if err != nil {
 		return fmt.Errorf("failed to create server: %w", err)
 	}
 
-	slog.Info("Listening", "address", address)
+	logger.Info("Listening", "address", address)
 	lis, err := net.Listen("tcp", address)
 	if err != nil {
 		return fmt.Errorf("failed to listen: %w", err)

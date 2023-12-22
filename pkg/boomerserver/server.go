@@ -1,5 +1,5 @@
-// Package server implements the boomer server. It makes things go boom.
-package server
+// Package boomerserver implements the boomer server. It makes things go boom.
+package boomerserver
 
 import (
 	"context"
@@ -9,8 +9,8 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 
-	"github.com/boyvinall/go-observability-app/pkg/boomer"
-	"github.com/boyvinall/go-observability-app/pkg/tracelog"
+	pb "github.com/boyvinall/go-observability-app/pkg/boomer"
+	"github.com/boyvinall/go-observability-app/pkg/logutil"
 )
 
 const (
@@ -18,35 +18,35 @@ const (
 )
 
 type server struct {
-	boomer.UnimplementedBoomerServer
+	pb.UnimplementedBoomerServer
 	tracer trace.Tracer
 }
 
 // New creates a new boomer server
 //
 // The server is registered with the provided GRPC server
-func New(grpcServer *grpc.Server) (boomer.BoomerServer, error) {
+func New(grpcServer *grpc.Server) (pb.BoomerServer, error) {
 	s := &server{
 		tracer: otel.Tracer("boomer-server"),
 	}
-	boomer.RegisterBoomerServer(grpcServer, s)
+	pb.RegisterBoomerServer(grpcServer, s)
 	return s, nil
 }
 
-func (s *server) Boom(ctx context.Context, req *boomer.BoomRequest) (*boomer.BoomResponse, error) {
+func (s *server) Boom(ctx context.Context, req *pb.BoomRequest) (*pb.BoomResponse, error) {
 	span := trace.SpanFromContext(ctx)
 	span.SetAttributes(attribute.String(attributeKeyName, req.GetName()))
 
-	l := tracelog.LoggerFromContext(ctx)
-	l.Info("boom", "name", req.GetName())
+	logger := logutil.LoggerFromContext(ctx)
+	logger.Info("boom", "name", req.GetName())
 
 	ctx, childSpan := s.tracer.Start(ctx, "child")
 	defer childSpan.End()
 
-	l = tracelog.LoggerFromContext(ctx)
-	l.Info("boom", "name", req.GetName())
+	logger = logutil.LoggerFromContext(ctx)
+	logger.Info("boom-child", "name", req.GetName())
 
 	childSpan.AddEvent("tick", trace.WithAttributes(attribute.Int("pid", 1234), attribute.String("origin", "reddit")))
 	childSpan.AddEvent("tick", trace.WithAttributes(attribute.Int("pid", 5678), attribute.String("precedes", "gen-x")))
-	return &boomer.BoomResponse{Message: "Boom!"}, nil
+	return &pb.BoomResponse{Message: "Boom!"}, nil
 }
