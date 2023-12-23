@@ -22,7 +22,7 @@ build: generate
 	CGO_ENABLED=0 go build -o bin/boomer ./cmd/boomer-server/
 
 .PHONY: lint # Run linter on the application code
-lint:
+lint: generate
 	$(call PROMPT,$@)
 	golangci-lint run
 
@@ -49,6 +49,12 @@ clean:
 	$(call PROMPT,$@)
 	rm -rf bin
 	rm -rf pkg/boomer/*.pb.go
+	rm -rf test/*.png
+
+.PHONY: purge # More aggressive clean .. delete anything not in git
+purge:
+	$(call PROMPT,$@)
+	git clean -fdx
 
 ############# Tooling targets #############
 
