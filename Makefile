@@ -85,6 +85,13 @@ run-client:
 	$(call PROMPT,$@)
 	go run ./cmd/boomer-cli/main.go
 
+############# Stack targets #############
+
+.PHONY: browser-tests # Run browser tests
+browser-tests:
+	$(call PROMPT,$@)
+	cd test && go run main.go
+
 #############
 
 .PHONY: help # Show help

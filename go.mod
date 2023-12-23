@@ -4,6 +4,7 @@ go 1.21.0
 
 require (
 	github.com/go-logr/logr v1.4.1
+	github.com/go-rod/rod v0.114.5
 	github.com/golangci/golangci-lint v1.55.2
 	github.com/prometheus/client_golang v1.17.0
 	github.com/urfave/cli/v2 v2.26.0
@@ -185,6 +186,11 @@ require (
 	github.com/yagipy/maintidx v1.0.0 // indirect
 	github.com/yeya24/promlinter v0.2.0 // indirect
 	github.com/ykadowak/zerologlint v0.1.3 // indirect
+	github.com/ysmood/fetchup v0.2.3 // indirect
+	github.com/ysmood/goob v0.4.0 // indirect
+	github.com/ysmood/got v0.34.1 // indirect
+	github.com/ysmood/gson v0.7.3 // indirect
+	github.com/ysmood/leakless v0.8.0 // indirect
 	gitlab.com/bosi/decorder v0.4.1 // indirect
 	go-simpler.org/sloglint v0.1.2 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.21.0 // indirect
