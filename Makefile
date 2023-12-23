@@ -1,3 +1,6 @@
+.PHONY: all # Default target - lint, build and start the stack
+all: lint docker-build start
+
 define PROMPT
 	@echo
 	@echo "**********************************************************"
@@ -8,8 +11,7 @@ define PROMPT
 	@echo
 endef
 
-.PHONY: all # Default target - run lint and build
-all: lint docker-build start
+############# Application targets #############
 
 GRPC_PROTO=\
 	pkg/boomer/boomer.proto
@@ -19,7 +21,12 @@ build: generate
 	$(call PROMPT,$@)
 	CGO_ENABLED=0 go build -o bin/boomer ./cmd/boomer-server/
 
-.PHONY: docker-build # Build the docker image
+.PHONY: lint # Run linter on the application code
+lint:
+	$(call PROMPT,$@)
+	golangci-lint run
+
+.PHONY: docker-build # Build local docker images
 docker-build:
 	$(call PROMPT,$@)
 	docker compose build
@@ -29,27 +36,6 @@ generate: \
 	$(GRPC_PROTO:.proto=.pb.go) \
 	$(GRPC_PROTO:.proto=_grpc.pb.go)
 
-.PHONY: download-dependencies # Download go dependencies
-download-dependencies:
-	$(call PROMPT,$@)
-	@go mod download -x
-
-.PHONY: install-tools # Install required build tools
-install-tools: download-dependencies
-	$(call PROMPT,$@)
-	@cat tools.go | grep _ | awk -F'"' '{print $$2}' | xargs -tI % go install %
-
-.PHONY: clean # Delete build artifacts
-clean:
-	$(call PROMPT,$@)
-	rm -rf bin
-	rm -rf pkg/boomer/*.pb.go
-
-.PHONY: lint # Run linter on the application code
-lint:
-	$(call PROMPT,$@)
-	golangci-lint run
-
 %_grpc.pb.go: %.proto Makefile
 	$(call PROMPT,$@)
 	protoc --go-grpc_out=paths=source_relative:. $<
@@ -57,6 +43,26 @@ lint:
 %.pb.go: %.proto Makefile
 	$(call PROMPT,$@)
 	protoc --go_out=paths=source_relative:. $<
+
+.PHONY: clean # Delete build artifacts
+clean:
+	$(call PROMPT,$@)
+	rm -rf bin
+	rm -rf pkg/boomer/*.pb.go
+
+############# Tooling targets #############
+
+.PHONY: download-dependencies # Download go dependencies
+download-dependencies:
+	$(call PROMPT,$@)
+	go mod download -x
+
+.PHONY: install-tools # Install required build tools
+install-tools: download-dependencies
+	$(call PROMPT,$@)
+	@cat tools.go | grep _ | awk -F'"' '{print $$2}' | xargs -tI % go install %
+
+############# Stack targets #############
 
 .PHONY: start # Start the docker-compose stack
 start:
@@ -73,8 +79,15 @@ run-client:
 	$(call PROMPT,$@)
 	go run ./cmd/boomer-cli/main.go
 
+#############
+
 .PHONY: help # Show help
 help:
-	@echo "Usage: make [target]"
 	@echo
-	@grep ^.PHONY Makefile | sed 's/\.PHONY: \(.*\) # \(.*\)/  \1\t\2/' | expand -t25
+	@echo "Usage: make [target...]"
+	@echo
+	@grep -E '^(.PHONY|#####)' Makefile | \
+		sed \
+			-e 's/\.PHONY: \(.*\) # \(.*\)/  \1\t\2/' \
+			-e 's/^#####.*$$//' | \
+		expand -t25
