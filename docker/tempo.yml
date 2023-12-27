@@ -44,6 +44,8 @@ storage:
       path: /tmp/data/wal  # where to store the the wal locally
     local:
       path: /tmp/data/blocks
+    block:
+      version: vParquet3 # https://grafana.com/docs/tempo/latest/configuration/parquet/
 
 overrides:
   defaults:
