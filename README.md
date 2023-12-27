@@ -70,7 +70,6 @@ make help
 - [ ] Exemplars from application code
 - [ ] Additional/improved provisioned dashboards
 - [ ] Improve `Logs to Metrics` in loki [datasource](./docker/grafana-datasources.yml)
-- [ ] Expose some metrics directly from the app
 - [ ] Add github actions for linting and other validation
 - [ ] Improve docs – use mkdocs and github pages to provide a rich description of all the capabilities, with screenshots and stuff .. maybe use [snippets](https://facelessuser.github.io/pymdown-extensions/extensions/snippets/)
 - [ ] Refactor [server main](./cmd/boomer-server/main.go)

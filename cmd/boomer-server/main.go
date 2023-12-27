@@ -10,6 +10,7 @@ import (
 	"os"
 	"time"
 
+	p "github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	cli "github.com/urfave/cli/v2"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
@@ -93,7 +94,7 @@ func run(address string) error {
 		slog.Info("serving metrics", "address", "localhost:2223/metrics")
 
 		mux := http.NewServeMux()
-		mux.Handle("/metrics", promhttp.Handler())
+		mux.Handle("/metrics", promhttp.HandlerFor(p.DefaultGatherer, promhttp.HandlerOpts{EnableOpenMetrics: true}))
 		metricServer := &http.Server{
 			Addr:              "0.0.0.0:2223",
 			ReadHeaderTimeout: 3 * time.Second, // fix for gosec G114
