@@ -68,7 +68,7 @@ make help
 ## TODO
 
 - [ ] Enable exemplars
-- [ ] Provision some dashboards
+- [ ] Additional/improved provisioned dashboards
 - [ ] Improve `Logs to Metrics` in loki [datasource](./docker/grafana-datasources.yml)
 - [ ] Expose some metrics directly from the app
 - [ ] Add github actions for linting and other validation
