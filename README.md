@@ -67,7 +67,7 @@ make help
 
 ## TODO
 
-- [ ] Enable exemplars
+- [ ] Exemplars from application code
 - [ ] Additional/improved provisioned dashboards
 - [ ] Improve `Logs to Metrics` in loki [datasource](./docker/grafana-datasources.yml)
 - [ ] Expose some metrics directly from the app
@@ -75,6 +75,7 @@ make help
 - [ ] Improve docs – use mkdocs and github pages to provide a rich description of all the capabilities, with screenshots and stuff .. maybe use [snippets](https://facelessuser.github.io/pymdown-extensions/extensions/snippets/)
 - [ ] Refactor [server main](./cmd/boomer-server/main.go)
 - [ ] Improve [CLI](./cmd/boomer-cli/main.go)
+- [ ] [Propagate](https://pkg.go.dev/go.opentelemetry.io/otel@v1.21.0/propagation#TraceContext.Inject) trace context through message queue
 
 Maybe:
 
@@ -89,3 +90,4 @@ Maybe:
 Future:
 
 - [ ] Open issue/PR on grafana to enable `tracesToMetrics` to use span name
+- [ ] ? Add doc section on best practices
