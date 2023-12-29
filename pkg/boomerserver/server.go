@@ -3,15 +3,19 @@ package boomerserver
 
 import (
 	"context"
+	"time"
 
+	"github.com/nats-io/nats.go"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/proto"
 
 	pb "github.com/boyvinall/go-observability-app/pkg/boomer"
 	"github.com/boyvinall/go-observability-app/pkg/logutil"
+	"github.com/boyvinall/go-observability-app/pkg/natscarrier"
 )
 
 const (
@@ -22,16 +26,26 @@ type server struct {
 	pb.UnimplementedBoomerServer
 	tracer trace.Tracer
 	foo    metric.Int64Counter
+	c      Connection
+}
+
+// Connection is an interface for publishing and requesting messages.
+// It is satisfied by NATS Conn, among others.
+type Connection interface {
+	Publish(subject string, msg []byte) error
+	Request(subject string, req []byte, timeout time.Duration) (resp *nats.Msg, err error)
+	RequestMsg(msg *nats.Msg, timeout time.Duration) (resp *nats.Msg, err error)
 }
 
 // New creates a new boomer server
 //
-// The server is registered with the provided GRPC server
-func New(grpcServer *grpc.Server) (pb.BoomerServer, error) {
+// The server is registered with the provided ServiceRegistrar
+func New(r grpc.ServiceRegistrar, c Connection) (pb.BoomerServer, error) {
 	s := &server{
 		tracer: otel.Tracer("boomer-server"),
+		c:      c,
 	}
-	pb.RegisterBoomerServer(grpcServer, s)
+	pb.RegisterBoomerServer(r, s)
 
 	m := otel.GetMeterProvider().Meter("app_or_package_name")
 
@@ -53,15 +67,32 @@ func (s *server) Boom(ctx context.Context, req *pb.BoomRequest) (*pb.BoomRespons
 	logger := logutil.LoggerFromContext(ctx)
 	logger.Info("boom", "name", req.GetName())
 
-	ctx, childSpan := s.tracer.Start(ctx, "child")
-	defer childSpan.End()
+	b, err := proto.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+
+	tc := otel.GetTextMapPropagator()
+	reqMsg := nats.NewMsg("req")
+	reqMsg.Data = b
+	tc.Inject(ctx, natscarrier.Header(reqMsg.Header))
+
+	msg, err := s.c.RequestMsg(reqMsg, 10*time.Second)
+	if err != nil {
+		return nil, err
+	}
+	var resp pb.BoomResponse
+	err = proto.Unmarshal(msg.Data, &resp)
+	if err != nil {
+		return nil, err
+	}
 
 	s.foo.Add(ctx, 1)
 
 	logger = logutil.LoggerFromContext(ctx)
 	logger.Info("boom-child", "name", req.GetName())
 
-	childSpan.AddEvent("tick", trace.WithAttributes(attribute.Int("pid", 1234), attribute.String("origin", "reddit")))
-	childSpan.AddEvent("tick", trace.WithAttributes(attribute.Int("pid", 5678), attribute.String("precedes", "gen-x")))
-	return &pb.BoomResponse{Message: "Boom!"}, nil
+	span.AddEvent("tick", trace.WithAttributes(attribute.Int("pid", 1234), attribute.String("origin", "reddit")))
+	span.AddEvent("tick", trace.WithAttributes(attribute.Int("pid", 5678), attribute.String("precedes", "gen-x")))
+	return &resp, nil
 }

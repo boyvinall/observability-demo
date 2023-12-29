@@ -67,7 +67,11 @@ make help
 
 ## TODO
 
-- [ ] Exemplars from application code
+- [ ] Investigate how to support exemplars from application code – currently it seems the golang SDK doesn't support this, see
+  [Support exemplars in Prometheus exporter](https://github.com/open-telemetry/opentelemetry-go/issues/3163) and
+  [Add support for exemplars](https://github.com/open-telemetry/opentelemetry-go/issues/559). However, there is an
+  [OTEP describing integration of exemplars with metrics sdk](https://github.com/open-telemetry/oteps/pull/113). Can also investigate
+  how tempo pushes generated metrics.
 - [ ] Additional/improved provisioned dashboards
 - [ ] Improve `Logs to Metrics` in loki [datasource](./docker/grafana-datasources.yml)
 - [ ] Add github actions for linting and other validation

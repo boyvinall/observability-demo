@@ -9,6 +9,12 @@ volumes:
 
 services:
 
+  #---------------------------------------------
+  #
+  #   Observability stack
+  #
+  #---------------------------------------------
+
   promtail:
     image: grafana/promtail:2.8.7
     container_name: promtail
@@ -86,6 +92,12 @@ services:
     labels:
       app: infra
 
+  #---------------------------------------------
+  #
+  #   Application stack
+  #
+  #---------------------------------------------
+
   boomer:
     container_name: boomer
     image: boomer
@@ -97,3 +109,30 @@ services:
       - "2223:2223" # metrics
     labels:
       app: boomer
+    depends_on:
+      - nats
+
+  nats:
+    container_name: nats
+    image: nats:2.10.7
+    labels:
+      app: nats
+    ports:
+      - "4222:4222" # NATS
+      - "8222:8222" # NATS Management
+
+  nats-exporter:
+    container_name: nats-exporter
+    image: natsio/prometheus-nats-exporter:latest
+    command: [
+      "-varz",
+      "-serverz",
+      "-connz",
+      "-routez",
+      "-subz",
+      "http://nats:8222",
+    ]
+    labels:
+      app: nats
+    ports:
+      - "7777:7777" # metrics

@@ -10,6 +10,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/nats-io/nats.go"
 	p "github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	cli "github.com/urfave/cli/v2"
@@ -17,6 +18,7 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/exporters/prometheus"
+	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/sdk/trace"
@@ -27,6 +29,7 @@ import (
 
 	"github.com/boyvinall/go-observability-app/pkg/boomerserver"
 	"github.com/boyvinall/go-observability-app/pkg/logutil"
+	"github.com/boyvinall/go-observability-app/pkg/worker"
 )
 
 //nolint:funlen
@@ -79,12 +82,15 @@ func run(address string) error {
 	//
 	//--------------------------------------------------
 
-	promexp, err := prometheus.New()
+	// Create the prometheus exporter
+	// For an example with more config options, see https://docs.daocloud.io/en/insight/06UserGuide/01quickstart/otel/meter/#create-an-initialization-function-using-the-opentelemetry-sdk
+	metricExp, err := prometheus.New()
 	if err != nil {
 		return fmt.Errorf("failed to initialize prometheus exporter: %w", err)
 	}
+
 	mp := metric.NewMeterProvider(
-		metric.WithReader(promexp),
+		metric.WithReader(metricExp),
 		metric.WithResource(r),
 	)
 	otel.SetMeterProvider(mp)
@@ -109,7 +115,7 @@ func run(address string) error {
 	//
 	//--------------------------------------------------
 
-	exp, err := otlptracegrpc.New(ctx,
+	traceExp, err := otlptracegrpc.New(ctx,
 		otlptracegrpc.WithEndpoint("tempo:4317"),
 		otlptracegrpc.WithInsecure(),
 		otlptracegrpc.WithHeaders(map[string]string{"x-scope-orgid": "1"}),
@@ -120,10 +126,13 @@ func run(address string) error {
 
 	tp := trace.NewTracerProvider(
 		trace.WithSampler(trace.AlwaysSample()),
-		trace.WithBatcher(exp),
+		trace.WithBatcher(traceExp),
 		trace.WithResource(r),
 	)
 	otel.SetTracerProvider(tp)
+
+	tc := propagation.TraceContext{}
+	otel.SetTextMapPropagator(tc)
 
 	//--------------------------------------------------
 	//
@@ -141,8 +150,20 @@ func run(address string) error {
 	)
 	reflection.Register(grpcServer)
 
+	// messaging
+	c, err := nats.Connect("nats://nats:4222")
+	if err != nil {
+		return err
+	}
+
+	// create the worker
+	_, err = worker.New(c)
+	if err != nil {
+		return fmt.Errorf("failed to create worker: %w", err)
+	}
+
 	// create the server
-	_, err = boomerserver.New(grpcServer)
+	_, err = boomerserver.New(grpcServer, c)
 	if err != nil {
 		return fmt.Errorf("failed to create server: %w", err)
 	}

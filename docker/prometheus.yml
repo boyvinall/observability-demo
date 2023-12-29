@@ -16,6 +16,10 @@ scrape_configs:
     static_configs:
       - targets: [ 'boomer:2223' ]
 
+  - job_name: 'nats'
+    static_configs:
+      - targets: [ 'nats-exporter:7777' ]
+
 storage:
   exemplars: # https://prometheus.io/docs/prometheus/latest/configuration/configuration/#exemplars
     max_exemplars: 100000
