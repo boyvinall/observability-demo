@@ -27,8 +27,12 @@ func runServer(config serverConfig) error {
 	ctx := context.Background()
 	g := errgroup.Group{}
 
-	// Setup OTEL components
-	// Do this first because it registers a bunch of globals
+	//--------------------------------------------------
+	//
+	//  Setup OTEL components
+	//  Do this first because it registers a bunch of globals
+	//
+	//--------------------------------------------------
 
 	err := util.SetupDefaultEnvironment(ctx, util.Config{
 		ServiceName:    "MyBoomerServer",

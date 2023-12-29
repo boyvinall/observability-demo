@@ -73,7 +73,7 @@ make help
   [OTEP describing integration of exemplars with metrics sdk](https://github.com/open-telemetry/oteps/pull/113). Can also investigate
   how tempo pushes generated metrics.
 - [ ] Additional/improved provisioned dashboards
-- [ ] Improve `Logs to Metrics` in loki [datasource](./docker/grafana-datasources.yml)
+- [ ] Improve `Logs to Metrics` in loki [datasource](./docker/datasources/datasources.yml)
 - [ ] Add github actions for linting and other validation
 - [ ] Improve docs – use mkdocs and github pages to provide a rich description of all the capabilities, with screenshots and stuff .. maybe use [snippets](https://facelessuser.github.io/pymdown-extensions/extensions/snippets/)
 - [ ] Improve [CLI](./cmd/boomer-cli/main.go)

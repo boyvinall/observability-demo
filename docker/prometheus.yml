@@ -14,7 +14,7 @@ scrape_configs:
 
   - job_name: 'boomer'
     static_configs:
-      - targets: [ 'boomer:2223' ]
+      - targets: [ 'boomer-server:2223', 'boomer-worker:2223' ]
 
   - job_name: 'nats'
     static_configs:
