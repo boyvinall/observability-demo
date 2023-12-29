@@ -76,9 +76,7 @@ make help
 - [ ] Improve `Logs to Metrics` in loki [datasource](./docker/grafana-datasources.yml)
 - [ ] Add github actions for linting and other validation
 - [ ] Improve docs – use mkdocs and github pages to provide a rich description of all the capabilities, with screenshots and stuff .. maybe use [snippets](https://facelessuser.github.io/pymdown-extensions/extensions/snippets/)
-- [ ] Refactor [server main](./cmd/boomer-server/main.go)
 - [ ] Improve [CLI](./cmd/boomer-cli/main.go)
-- [ ] [Propagate](https://pkg.go.dev/go.opentelemetry.io/otel@v1.21.0/propagation#TraceContext.Inject) trace context through message queue
 
 Maybe:
 

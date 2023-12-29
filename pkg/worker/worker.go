@@ -9,8 +9,8 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	pb "github.com/boyvinall/go-observability-app/pkg/boomer"
-	"github.com/boyvinall/go-observability-app/pkg/logutil"
 	"github.com/boyvinall/go-observability-app/pkg/natscarrier"
+	"github.com/boyvinall/go-observability-app/pkg/util"
 )
 
 type Connection interface {
@@ -42,7 +42,7 @@ func (w *Worker) Handler(msg *nats.Msg) {
 	tc := otel.GetTextMapPropagator()
 	ctx := tc.Extract(context.Background(), natscarrier.Header(msg.Header))
 
-	l := logutil.LoggerFromContext(ctx)
+	l := util.LoggerFromContext(ctx)
 	l.Info("received request",
 		"subject", msg.Subject,
 		"reply", msg.Reply,

@@ -99,14 +99,33 @@ services:
   #---------------------------------------------
 
   boomer:
-    container_name: boomer
+    container_name: boomer-server
     image: boomer
+    command: [
+      "server"
+    ]
     build:
       context: .
       dockerfile: Dockerfile
     ports:
       - "8080:8080" # GRPC
       - "2223:2223" # metrics
+    labels:
+      app: boomer
+    depends_on:
+      - nats
+
+  worker:
+    container_name: boomer-worker
+    image: boomer
+    command: [
+      "worker"
+    ]
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "2224:2223" # metrics
     labels:
       app: boomer
     depends_on:

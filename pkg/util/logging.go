@@ -1,14 +1,12 @@
-// Package logutil has some helpers for logging
-//
-// It's currently useful for setting up a logger with trace context but
-// might be expanded later.
-package logutil
+package util
 
 import (
 	"context"
 	"log/slog"
+	"os"
 
 	"github.com/go-logr/logr"
+	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 )
@@ -27,6 +25,9 @@ func UnaryServerInterceptor(logger *slog.Logger) grpc.UnaryServerInterceptor {
 
 // SetContext sets the logger in the context
 func SetContext(ctx context.Context, logger *slog.Logger) context.Context {
+	if logger == nil {
+		return ctx
+	}
 	return context.WithValue(ctx, loggerKey{}, logger)
 }
 
@@ -50,4 +51,19 @@ func LoggerFromContext(ctx context.Context) *slog.Logger {
 // This is useful for setting up the opentelemetry logger, which uses logr.
 func LogrFromSlog(logger *slog.Logger) logr.Logger {
 	return logr.FromSlogHandler(logger.Handler())
+}
+
+// NewLoggerForResource creates a new logger with some fields from the resource
+func NewLoggerForResource(r *resource.Resource, level slog.Leveler) *slog.Logger {
+	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: level}))
+
+	if hostName := GetResourceHostName(r); hostName != "" {
+		logger = logger.With("hostname", hostName)
+	}
+
+	if serviceName := GetResourceServiceName(r); serviceName != "" {
+		logger = logger.With("service_name", serviceName)
+	}
+
+	return logger
 }

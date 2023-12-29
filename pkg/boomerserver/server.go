@@ -14,8 +14,8 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	pb "github.com/boyvinall/go-observability-app/pkg/boomer"
-	"github.com/boyvinall/go-observability-app/pkg/logutil"
 	"github.com/boyvinall/go-observability-app/pkg/natscarrier"
+	"github.com/boyvinall/go-observability-app/pkg/util"
 )
 
 const (
@@ -64,7 +64,7 @@ func (s *server) Boom(ctx context.Context, req *pb.BoomRequest) (*pb.BoomRespons
 	span := trace.SpanFromContext(ctx)
 	span.SetAttributes(attribute.String(attributeKeyName, req.GetName()))
 
-	logger := logutil.LoggerFromContext(ctx)
+	logger := util.LoggerFromContext(ctx)
 	logger.Info("boom", "name", req.GetName())
 
 	b, err := proto.Marshal(req)
@@ -89,7 +89,7 @@ func (s *server) Boom(ctx context.Context, req *pb.BoomRequest) (*pb.BoomRespons
 
 	s.foo.Add(ctx, 1)
 
-	logger = logutil.LoggerFromContext(ctx)
+	logger = util.LoggerFromContext(ctx)
 	logger.Info("boom-child", "name", req.GetName())
 
 	span.AddEvent("tick", trace.WithAttributes(attribute.Int("pid", 1234), attribute.String("origin", "reddit")))
