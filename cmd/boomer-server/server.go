@@ -12,8 +12,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
-	"github.com/boyvinall/go-observability-app/pkg/boomerserver"
-	"github.com/boyvinall/go-observability-app/pkg/util"
+	"github.com/boyvinall/observability-demo/pkg/boomerserver"
+	"github.com/boyvinall/observability-demo/pkg/util"
 )
 
 type serverConfig struct {

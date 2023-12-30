@@ -1,4 +1,4 @@
-module github.com/boyvinall/go-observability-app
+module github.com/boyvinall/observability-demo
 
 go 1.21.0
 

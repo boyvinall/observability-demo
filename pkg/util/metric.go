@@ -13,6 +13,7 @@ import (
 	"go.opentelemetry.io/otel/sdk/resource"
 )
 
+// NewMeterProviderForResource creates a prometheus-based OTEL MeterProvider with a default resource
 func NewMeterProviderForResource(r *resource.Resource) (*metric.MeterProvider, error) {
 	// Create the prometheus exporter
 	// For an example with more config options, see https://docs.daocloud.io/en/insight/06UserGuide/01quickstart/otel/meter/#create-an-initialization-function-using-the-opentelemetry-sdk
@@ -29,6 +30,7 @@ func NewMeterProviderForResource(r *resource.Resource) (*metric.MeterProvider, e
 	return mp, nil
 }
 
+// ServeMetrics starts an HTTP server to serve prometheus metrics
 func ServeMetrics(address string) func() error {
 	return func() error {
 		slog.Info("serving metrics", "address", address)

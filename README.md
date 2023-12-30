@@ -1,12 +1,22 @@
-# go-observability-app
+# observability-demo
 
 Simple golang app that showcases some logging, metrics, tracing and stuff.
 
-The app itself is a super simple GRPC server which demonstrates how to expose OTEL metrics and traces, plus also some log messages which
-have the trace info.
+The demo consists of:
 
-The stack includes grafana/loki/tempo/prometheus and shows a bunch of different links between datasources, so that you can easily navigate
-between all the different signals.
+- Some golang executables:
+  - GRPC server
+  - worker service which receives messages from the GRPC server over NATS
+  - command-line app to post requests to the GRPC server
+- Various infra services
+  - grafana - including provisioned datasources and dashboards
+  - loki/promtail
+  - tempo
+  - prometheus
+  - (also a NATS server)
+
+These components collectively show how to expose OTEL metrics and traces, plus also some log messages which have the trace info. The grafana
+datasources are configured with a bunch of different links so that you can easily navigate between all the different signals.
 
 ## Motivation
 
@@ -28,8 +38,8 @@ Why does this repo exist?  Well, a few reasons:
   we use – although we do run OTEL Collectors and some Prometheii that remote-write to other places.  So, this also partly exists to ensure
   we have a clear view of all the capabilities offered by the latest incarnations of those services/datasources.
 
-- Lastly, it's a turbulent world out there.  Although I've not been a fully hands-on developer for some time, it's fair to say I'm still an
-  active contributor, but much of my work exists on a private github enterprise server.  So, there's no harm in having a public showcase of
+- Lastly, it's a turbulent world out there.  Although I'm not a fully hands-on developer these days, it's fair to say I'm still an
+  active contributor, but much of my work exists on a private github enterprise server.  So, there's no harm in having a public example of
   _some_ of my experience.  This is not the only example of that, but since I am something of an observability and service-reliabilty
   zealot, it makes sense to create a body of work that demonstrates that aspect.
 

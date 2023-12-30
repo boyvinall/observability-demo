@@ -1,3 +1,4 @@
+// Package worker implements a message-based worker for the boomer service
 package worker
 
 import (
@@ -8,15 +9,17 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/protobuf/proto"
 
-	pb "github.com/boyvinall/go-observability-app/pkg/boomer"
-	"github.com/boyvinall/go-observability-app/pkg/natscarrier"
-	"github.com/boyvinall/go-observability-app/pkg/util"
+	pb "github.com/boyvinall/observability-demo/pkg/boomer"
+	"github.com/boyvinall/observability-demo/pkg/natscarrier"
+	"github.com/boyvinall/observability-demo/pkg/util"
 )
 
+// Connection is an interface for subscribing to messages
 type Connection interface {
 	Subscribe(subj string, cb nats.MsgHandler) (*nats.Subscription, error)
 }
 
+// Worker processes and responds to requests from a message queue
 type Worker struct {
 	tracer trace.Tracer
 	sub    *nats.Subscription
@@ -54,20 +57,20 @@ func (w *Worker) Handler(msg *nats.Msg) {
 	var req pb.BoomRequest
 	err := proto.Unmarshal(msg.Data, &req)
 	if err != nil {
-		msg.Nak()
+		_ = msg.Nak()
 		return
 	}
 
 	resp := &pb.BoomResponse{Message: "Boom!"}
 	b, err := proto.Marshal(resp)
 	if err != nil {
-		msg.Nak()
+		_ = msg.Nak()
 		return
 	}
 
 	err = msg.Respond(b)
 	if err != nil {
-		msg.Nak()
+		_ = msg.Nak()
 		return
 	}
 }

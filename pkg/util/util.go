@@ -11,6 +11,7 @@ import (
 	"go.opentelemetry.io/otel/propagation"
 )
 
+// Config is used to configure the environment
 type Config struct {
 	ServiceName    string
 	ServiceVersion string
@@ -18,6 +19,7 @@ type Config struct {
 	LogLevel       slog.Leveler
 }
 
+// SetupDefaultEnvironment creates and registers components for logging, metrics, and tracing
 func SetupDefaultEnvironment(ctx context.Context, c Config) error {
 
 	// resource
@@ -36,6 +38,9 @@ func SetupDefaultEnvironment(ctx context.Context, c Config) error {
 	// metrics
 
 	mp, err := NewMeterProviderForResource(r)
+	if err != nil {
+		return fmt.Errorf("failed to create meter provider: %w", err)
+	}
 	otel.SetMeterProvider(mp)
 
 	// traces
@@ -45,6 +50,9 @@ func SetupDefaultEnvironment(ctx context.Context, c Config) error {
 		otlptracegrpc.WithInsecure(),
 		otlptracegrpc.WithHeaders(map[string]string{"x-scope-orgid": "1"}),
 	)
+	if err != nil {
+		return fmt.Errorf("failed to create tracer provider: %w", err)
+	}
 	otel.SetTracerProvider(tp)
 
 	// TraceContext is used to propagate trace context across process boundaries

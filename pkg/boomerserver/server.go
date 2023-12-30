@@ -13,9 +13,9 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/proto"
 
-	pb "github.com/boyvinall/go-observability-app/pkg/boomer"
-	"github.com/boyvinall/go-observability-app/pkg/natscarrier"
-	"github.com/boyvinall/go-observability-app/pkg/util"
+	pb "github.com/boyvinall/observability-demo/pkg/boomer"
+	"github.com/boyvinall/observability-demo/pkg/natscarrier"
+	"github.com/boyvinall/observability-demo/pkg/util"
 )
 
 const (

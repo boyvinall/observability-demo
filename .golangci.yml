@@ -97,7 +97,7 @@ linters-settings:
   goimports:
     # put imports beginning with prefix after 3rd-party packages;
     # it's a comma-separated list of prefixes
-    local-prefixes: github.com/boyvinall/go-observability-app
+    local-prefixes: github.com/boyvinall/observability-demo
   gocyclo:
     # minimal code complexity to report, 30 by default (but we recommend 10-20)
     min-complexity: 30
@@ -264,46 +264,20 @@ issues:
   # But independently from this option we use default exclude patterns,
   # it can be disabled by `exclude-use-default: false`. To list all
   # excluded by default patterns execute `golangci-lint run --help`
-  # exclude:
-  #   - should have comment (.* )?or be unexported
-  #   - at least one file in a package should have a package comment
-  #   - Line contains TODO/BUG/FIXME
-  #   - unnecessary leading newline
-  #   - grpc.WithTimeout is deprecated
-  #   - use regexp.MustCompile
-  #   - declaration of "err" shadows declaration at
-  #   - Deferring unsafe method "Close" on type "io.ReadCloser"
-  #   - Use of net/http serve function that has no support for setting timeouts
-  #   - seems to be unused, consider removing or renaming it as _
-  #   - preferFprint
+  exclude:
+    - unnecessary leading newline
 
   # Excluding configuration per-path, per-linter, per-text and per-source
   exclude-rules:
-    # Exclude known linters from partially hard-vendored code,
-    # which is impossible to exclude via "nolint" comments.
-    - path: internal/hmac/
-      text: "weak cryptographic primitive"
-      linters:
-        - gosec
-
-    # Exclude some staticcheck messages
-    - linters:
-        - staticcheck
-      text: "SA9003:"
-
-    # Exclude lll issues for long lines with go:generate
-    - linters:
-        - lll
-      source: "^//go:generate "
-
-    - linters:
-        - gochecknoglobals
-      source: "(cli.Command|cli.[A-Z][a-z]*Flag|prometheus.NewDesc)"
 
     - linters:
         - errcheck
         - gosec
       source: "^[ \t]*defer "
+
+    - linters:
+        - lll
+      source: https://docs.daocloud.io/en/insight/06UserGuide/01quickstart/otel/meter/
 
   # Independently from option `exclude` we use default exclude patterns,
   # it can be disabled by this option. To list all

@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package boomer;
-option go_package = "github.com/boyvinall/go-observability-app/pkg/boomer/";
+option go_package = "github.com/boyvinall/observability-demo/pkg/boomer/";
 
 message BoomRequest {
   string name = 1;

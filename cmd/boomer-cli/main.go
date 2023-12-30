@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	"github.com/boyvinall/go-observability-app/pkg/boomer"
+	"github.com/boyvinall/observability-demo/pkg/boomer"
 )
 
 func main() {

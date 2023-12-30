@@ -8,8 +8,8 @@ import (
 	"github.com/nats-io/nats.go"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/boyvinall/go-observability-app/pkg/util"
-	"github.com/boyvinall/go-observability-app/pkg/worker"
+	"github.com/boyvinall/observability-demo/pkg/util"
+	"github.com/boyvinall/observability-demo/pkg/worker"
 )
 
 type workerConfig struct {
