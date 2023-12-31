@@ -17,7 +17,7 @@ grpcServer := grpc.NewServer(
 )
 ```
 
-Then, in our [GRPC method](https://pkg.go.dev/github.com/boyvinall/observability-demo/pkg/boomerserver#server.Boom), we simply call
+Then, in our [GRPC method](https://pkg.go.dev/github.com/boyvinall/observability-demo/pkg/boomerserver#Server.Boom), we simply call
 
 ```go
 func (s *server) Boom(ctx context.Context, req *pb.BoomRequest) (*pb.BoomResponse, error) {

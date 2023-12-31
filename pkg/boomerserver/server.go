@@ -22,7 +22,8 @@ const (
 	attributeKeyName = "boomer.name"
 )
 
-type server struct {
+// Server implements the boomer server
+type Server struct {
 	pb.UnimplementedBoomerServer
 	tracer trace.Tracer
 	foo    metric.Int64Counter
@@ -41,7 +42,7 @@ type Connection interface {
 //
 // The server is registered with the provided ServiceRegistrar
 func New(r grpc.ServiceRegistrar, c Connection) (pb.BoomerServer, error) {
-	s := &server{
+	s := &Server{
 		tracer: otel.Tracer("boomer-server"),
 		c:      c,
 	}
@@ -60,7 +61,8 @@ func New(r grpc.ServiceRegistrar, c Connection) (pb.BoomerServer, error) {
 	return s, nil
 }
 
-func (s *server) Boom(ctx context.Context, req *pb.BoomRequest) (*pb.BoomResponse, error) {
+// Boom implements the Boomer GRPC interface
+func (s *Server) Boom(ctx context.Context, req *pb.BoomRequest) (*pb.BoomResponse, error) {
 	span := trace.SpanFromContext(ctx)
 	span.SetAttributes(attribute.String(attributeKeyName, req.GetName()))
 
