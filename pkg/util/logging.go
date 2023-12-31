@@ -37,6 +37,8 @@ func LoggerFromContext(ctx context.Context) *slog.Logger {
 	if !ok {
 		logger = slog.Default()
 	}
+
+	// --8<-- [start:logger-from-context]
 	spanContext := trace.SpanContextFromContext(ctx)
 	if spanContext.HasTraceID() {
 		logger = logger.With("trace_id", spanContext.TraceID().String())
@@ -44,6 +46,8 @@ func LoggerFromContext(ctx context.Context) *slog.Logger {
 	if spanContext.HasSpanID() {
 		logger = logger.With("span_id", spanContext.SpanID().String())
 	}
+	// --8<-- [end:logger-from-context]
+
 	return logger
 }
 
@@ -54,7 +58,9 @@ func LogrFromSlog(logger *slog.Logger) logr.Logger {
 }
 
 // NewLoggerForResource creates a new logger with some fields from the resource
+// --8<-- [start:new-logger-for-resource]
 func NewLoggerForResource(r *resource.Resource, level slog.Leveler) *slog.Logger {
+
 	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: level}))
 
 	if hostName := GetResourceHostName(r); hostName != "" {
@@ -67,3 +73,5 @@ func NewLoggerForResource(r *resource.Resource, level slog.Leveler) *slog.Logger
 
 	return logger
 }
+
+// --8<-- [end:new-logger-for-resource]

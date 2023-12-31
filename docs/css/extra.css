@@ -1,0 +1,27 @@
+/* Ensure headers use up the full width to avoid admonitions are overlapping with content it's not meant for */
+.md-typeset h1,h2,h3,h4,h5,h6 {
+  width: 100%;
+  display: flex;
+}
+
+/* Increase font sizes of various elements */
+p {
+  font-size: 18px
+}
+
+dl,dt,dd,li,ul {
+  font-size: 18px
+}
+
+.md-typeset code {
+  font-size: 14px;
+}
+
+/* Tidy up spacing to make it a bit easier to read */
+.md-typeset ul li {
+  margin-bottom: 0;
+}
+
+.md-typeset dd {
+  margin-top: 2px;
+}

@@ -1,0 +1,9 @@
+no-inline-html: false
+line-length:
+  line_length: 140
+  heading_line_length: 40
+  code_block_line_length: 200
+  tables: false
+ul-indent:
+  indent: 4 # mkdocs uses Python-Markdown, which requires this to be 4
+  start_indented: false

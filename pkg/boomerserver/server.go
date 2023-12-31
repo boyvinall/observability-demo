@@ -65,7 +65,7 @@ func (s *server) Boom(ctx context.Context, req *pb.BoomRequest) (*pb.BoomRespons
 	span.SetAttributes(attribute.String(attributeKeyName, req.GetName()))
 
 	logger := util.LoggerFromContext(ctx)
-	logger.Info("boom", "name", req.GetName())
+	logger.Info("boom", "boomer_name", req.GetName())
 
 	b, err := proto.Marshal(req)
 	if err != nil {

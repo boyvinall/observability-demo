@@ -1,0 +1,90 @@
+# Project information
+site_name: Grafana/Golang Observability
+site_description: Demo app for observability with golang
+site_author: Matt Vinall
+site_url: https://boyvinall.github.io/observability-demo
+
+# Repository
+repo_url: https://github.com/boyvinall/observability-demo
+edit_uri: 'edit/main/docs'
+
+# Navigation
+docs_dir: docs
+nav:
+  - index.md
+  - logging.md
+  - tracing.md
+
+  - about-docs.md
+
+# Configuration
+theme:
+  features:
+    - toc.follow
+    - content.code.copy
+  name: 'material'
+  language: 'en'
+  palette:
+    # Palette toggle for light mode
+    - scheme: default
+      media: "(prefers-color-scheme: light)"
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - scheme: slate
+      media: "(prefers-color-scheme: dark)"
+      primary: black
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: 'Roboto'
+    code: 'Roboto Mono'
+  # logo: 
+
+# Extensions
+markdown_extensions:
+  - admonition
+  - footnotes
+  - meta
+  - tables
+  - smarty
+  - def_list
+  - fenced_code
+  - sane_lists
+  - pymdownx.highlight:
+      linenums: true
+      linenums_style: pymdownx-inline
+      anchor_linenums: true
+  - pymdownx.arithmatex
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.critic
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_generator: !!python/name:pymdownx.emoji.to_svg
+  - pymdownx.inlinehilite
+  - pymdownx.magiclink
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      dedent_subsections: true
+  - pymdownx.superfences
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+  - codehilite:
+      guess_lang: false
+  - toc:
+      permalink: true
+  - plantuml_markdown:
+      server: http://www.plantuml.com/plantuml
+
+# Customization
+extra_css: [css/extra.css]
