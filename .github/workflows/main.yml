@@ -10,6 +10,7 @@ jobs:
   go-docs:
     runs-on: ubuntu-22.04
     steps:
+      - run: touch go.sum
       - uses: actions/setup-go@v4
         with:
           go-version: '1.21'
