@@ -1,4 +1,4 @@
-// Package util has some helpers for setting up common components
+// Package util has some helpers for setting up common components.
 package util
 
 import (
@@ -11,12 +11,12 @@ import (
 	"go.opentelemetry.io/otel/propagation"
 )
 
-// Config is used to configure the environment
+// Config is passed to [SetupDefaultEnvironment] to configure the environment
 type Config struct {
-	ServiceName    string
-	ServiceVersion string
-	OTLPEndpoint   string
-	LogLevel       slog.Leveler
+	ServiceName    string       // ServiceName is applied to the otel resource
+	ServiceVersion string       // ServiceVersion is applied to the otel resource
+	OTLPEndpoint   string       // OTLPEndpoint is the endpoint for the OTLP exporter
+	LogLevel       slog.Leveler // LogLevel is the log level
 }
 
 // SetupDefaultEnvironment creates and registers components for logging, metrics, and tracing

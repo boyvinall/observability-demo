@@ -14,8 +14,8 @@ import (
 // loggerKey is used to store the logger in the context
 type loggerKey struct{}
 
-// UnaryServerInterceptor returns a grpc.UnaryServerInterceptor that helps to make a logger
-// accessible from GRPC context.
+// UnaryServerInterceptor returns a [grpc.UnaryServerInterceptor] that helps to make a logger
+// accessible from GRPC context, see [LoggerFromContext].
 func UnaryServerInterceptor(logger *slog.Logger) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 		ctx = SetContext(ctx, logger)
@@ -23,7 +23,7 @@ func UnaryServerInterceptor(logger *slog.Logger) grpc.UnaryServerInterceptor {
 	}
 }
 
-// SetContext sets the logger in the context
+// SetContext sets the provided logger as a context value, to be later retrieved using [LoggerFromContext].
 func SetContext(ctx context.Context, logger *slog.Logger) context.Context {
 	if logger == nil {
 		return ctx
@@ -31,7 +31,10 @@ func SetContext(ctx context.Context, logger *slog.Logger) context.Context {
 	return context.WithValue(ctx, loggerKey{}, logger)
 }
 
-// LoggerFromContext returns the logger from the context
+// LoggerFromContext returns a [slog.Logger] from the context, with trace/span IDs set as log attributes.
+// The logger can be injected into the context using [SetContext] or [UnaryServerInterceptor].
+// If no [slog.Logger] is found in the context, the default logger is returned,
+// but will still have trace/span IDs set as log attributes if available.
 func LoggerFromContext(ctx context.Context) *slog.Logger {
 	logger, ok := ctx.Value(loggerKey{}).(*slog.Logger)
 	if !ok {
@@ -51,18 +54,20 @@ func LoggerFromContext(ctx context.Context) *slog.Logger {
 	return logger
 }
 
-// LogrFromSlog returns a logr.Logger from a slog.Logger
-// This is useful for setting up the opentelemetry logger, which uses logr.
+// LogrFromSlog returns a [logr.Logger] from a [slog.Logger].
+// This is useful for [setting up] the opentelemetry logger.
+//
+// [setting up]: https://pkg.go.dev/go.opentelemetry.io/otel#SetLogger
 func LogrFromSlog(logger *slog.Logger) logr.Logger {
 	return logr.FromSlogHandler(logger.Handler())
 }
 
-// NewLoggerForResource creates a new logger with some fields from the resource
-// --8<-- [start:new-logger-for-resource]
+// NewLoggerForResource creates a new [slog.Logger] with some attributes from the resource
 func NewLoggerForResource(r *resource.Resource, level slog.Leveler) *slog.Logger {
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: level}))
 
+	// --8<-- [start:new-logger-for-resource]
 	if hostName := GetResourceHostName(r); hostName != "" {
 		logger = logger.With("hostname", hostName)
 	}
@@ -70,8 +75,7 @@ func NewLoggerForResource(r *resource.Resource, level slog.Leveler) *slog.Logger
 	if serviceName := GetResourceServiceName(r); serviceName != "" {
 		logger = logger.With("service_name", serviceName)
 	}
+	// --8<-- [end:new-logger-for-resource]
 
 	return logger
 }
-
-// --8<-- [end:new-logger-for-resource]

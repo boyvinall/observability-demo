@@ -1,4 +1,4 @@
-// Package worker implements a message-based worker for the boomer service
+// Package worker implements a message-based worker for the boomer service.
 package worker
 
 import (
@@ -40,7 +40,7 @@ func New(c Connection) (*Worker, error) {
 	return w, nil
 }
 
-// Handler handles requests
+// Handler processes and responds to the [nats.Msg].
 func (w *Worker) Handler(msg *nats.Msg) {
 	tc := otel.GetTextMapPropagator()
 	ctx := tc.Extract(context.Background(), natscarrier.Header(msg.Header))

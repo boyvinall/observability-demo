@@ -3,6 +3,7 @@ module github.com/boyvinall/observability-demo
 go 1.21.0
 
 require (
+	github.com/cenkalti/backoff/v4 v4.2.1
 	github.com/go-logr/logr v1.4.1
 	github.com/go-rod/rod v0.114.5
 	github.com/golangci/golangci-lint v1.55.2
@@ -52,7 +53,6 @@ require (
 	github.com/butuzov/mirror v1.1.0 // indirect
 	github.com/catenacyber/perfsprint v0.2.0 // indirect
 	github.com/ccojocar/zxcvbn-go v1.0.1 // indirect
-	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/charithe/durationcheck v0.0.10 // indirect
 	github.com/chavacava/garif v0.1.0 // indirect

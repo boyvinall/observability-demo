@@ -31,16 +31,15 @@ type Server struct {
 }
 
 // Connection is an interface for publishing and requesting messages.
-// It is satisfied by NATS Conn, among others.
+// It is satisfied by [nats.Conn], among others.
 type Connection interface {
 	Publish(subject string, msg []byte) error
 	Request(subject string, req []byte, timeout time.Duration) (resp *nats.Msg, err error)
 	RequestMsg(msg *nats.Msg, timeout time.Duration) (resp *nats.Msg, err error)
 }
 
-// New creates a new boomer server
-//
-// The server is registered with the provided ServiceRegistrar
+// New creates a new boomer server.
+// The server is registered with the provided [grpc.ServiceRegistrar].
 func New(r grpc.ServiceRegistrar, c Connection) (pb.BoomerServer, error) {
 	s := &Server{
 		tracer: otel.Tracer("boomer-server"),
@@ -61,7 +60,7 @@ func New(r grpc.ServiceRegistrar, c Connection) (pb.BoomerServer, error) {
 	return s, nil
 }
 
-// Boom implements the Boomer GRPC interface
+// Boom implements the [pb.BoomerServer] GRPC interface
 func (s *Server) Boom(ctx context.Context, req *pb.BoomRequest) (*pb.BoomResponse, error) {
 	span := trace.SpanFromContext(ctx)
 	span.SetAttributes(attribute.String(attributeKeyName, req.GetName()))

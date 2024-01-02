@@ -1,4 +1,7 @@
-// Package natscarrier provides an OTEL TextMapCarrierimplementation for NATS messages
+// Package natscarrier provides an OTEL TextMapCarrier implementation for NATS messages.
+//
+// The carrier can be used to inject and extract trace/span IDs from a [nats.Msg] via
+// [go.opentelemetry.io/otel/propagation.TextMapPropagator].
 package natscarrier
 
 import (
@@ -7,10 +10,11 @@ import (
 	"github.com/nats-io/nats.go"
 )
 
-// Header is a TextMapCarrier that uses a nats.Header held in memory as a storage
+// Header implements the [go.opentelemetry.io/otel/propagation.TextMapCarrier] interface
+// using a [nats.Header] held in memory as a storage
 type Header nats.Header
 
-// Get implements the TextMapCarrier interface
+// Get returns the value associated with the passed key
 func (h Header) Get(key string) string {
 	v, found := h[key]
 	if !found {
@@ -22,12 +26,12 @@ func (h Header) Get(key string) string {
 	return h[key][0]
 }
 
-// Set implements the TextMapCarrier interface
+// Set stores the key-value pair
 func (h Header) Set(key string, value string) {
 	h[key] = []string{value}
 }
 
-// Keys implements the TextMapCarrier interface
+// Keys lists the keys stored in this carrier
 func (h Header) Keys() []string {
 	keys := make([]string, len(h))
 	i := 0
@@ -38,7 +42,7 @@ func (h Header) Keys() []string {
 	return keys
 }
 
-// String implements the fmt.Stringer interface
+// String implements the [fmt.Stringer] interface, see [Header]
 func (h Header) String() string {
 	s := make([]string, 0, len(h))
 	for k, v := range h {

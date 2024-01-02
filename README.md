@@ -75,12 +75,21 @@ make help
 
 ## Docs
 
-The documentation is built with [mkdocs](https://www.mkdocs.org/) and [mkdocs-material](https://squidfunk.github.io/mkdocs-material/).
-It can be served as follows:
+The [documentation](./docs/) is built with [mkdocs](https://www.mkdocs.org/) and [mkdocs-material](https://squidfunk.github.io/mkdocs-material/).
+It's published as <https://boyvinall.github.io/observability-demo/> but can be served locally as follows:
 
 ```plaintext
 pip3 install -r requirements.txt
 mkdocs serve
+```
+
+The code is also reasonably-well documented using syntax described by <https://go.dev/doc/comment>, see
+[generated docs](https://pkg.go.dev/github.com/boyvinall/observability-demo). You can run your own doc server
+to view local changes as follows:
+
+```plaintext
+go install golang.org/x/pkgsite/cmd/pkgsite@latest
+pkgsite
 ```
 
 ## TODO
