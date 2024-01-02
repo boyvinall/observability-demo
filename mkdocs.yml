@@ -49,6 +49,7 @@ theme:
 
 # Extensions
 markdown_extensions:
+  - attr_list
   - admonition
   - footnotes
   - meta

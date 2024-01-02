@@ -1,13 +1,13 @@
 # Introduction
 
-These docs explain how to create a Go app that has logs, metrics and traces visible in Grafana.  The Grafana datasources are configured
-to make it easy to navigate between each of these signals, providing a seamless click-through experience.  The implementation of metrics and
-traces within the app makes use of [OpenTelemetry-Go](https://pkg.go.dev/go.opentelemetry.io/otel), and logging uses the `log/slog` package
+This site shows how to create a Go app that has logs, metrics and traces visible in Grafana.  The Grafana datasources are configured to
+ensure a seamless click-through experience between each of these signals.  The implementation of metrics and traces within the app makes use
+of [OpenTelemetry-Go](https://pkg.go.dev/go.opentelemetry.io/otel), and logging uses the [log/slog](https://pkg.go.dev/log/slog) package
 that was [introduced](https://go.dev/blog/slog) in Go 1.21.
 
-The docs are backed by a [fully-working demo](https://github.com/boyvinall/observability-demo), so you can easily run it up and explore how
-to use things.  This also means you have a complete reference for how to implement things yourself – many other examples online exist only
-as small fragments, often requiring you to read a bunch of other docs before you have enough to get that _*!&$@%_ thing working.
+The site is backed by a [fully-working demo](https://github.com/boyvinall/observability-demo), so you can easily run it up and explore how
+to navigate around.  This also means you have a complete reference for how to implement things yourself – many other examples online exist
+only as small fragments, often requiring you to read a bunch of other docs before you have enough to get that _*!&$@%_ thing working.
 
 The demo consists of:
 

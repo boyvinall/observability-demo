@@ -1,6 +1,6 @@
 # observability-demo
 
-Simple golang app that showcases some logging, metrics, tracing and stuff.
+Simple golang demo app to generate logs/metrics/traces, and some infra components to make these signals available in grafana.
 
 The demo consists of:
 
@@ -9,20 +9,19 @@ The demo consists of:
   - worker service which receives messages from the GRPC server over NATS
   - command-line app to post requests to the GRPC server
 - Various infra services
-  - grafana - including provisioned datasources and dashboards
-  - loki/promtail
-  - tempo
-  - prometheus
+  - Grafana - including provisioned datasources and dashboards
+  - Loki/Promtail
+  - Tempo
+  - Prometheus
   - (also a NATS server)
 
-These components collectively show how to expose OTEL metrics and traces, plus also some log messages which have the trace info. The grafana
-datasources are configured with a bunch of different links so that you can easily navigate between all the different signals.
+The Grafana datasources are configured with a bunch of different links showing how to navigate between all the different signals.
 
 ## Motivation
 
 Why does this repo exist?  Well, a few reasons:
 
-- Many of the capabilities being explored/showcased here are still under active development.  Although grafana documentation is generally
+- Many of the capabilities being explored/showcased here are still under active development.  Although Grafana documentation is generally
   extremely good, there are parts which are not super clear .. fragmented examples etc.  So, I hope this could prove useful to others as
   a holistic demonstration of how to make it all work together.  There's no attempt here to show how to scale the observability stack itself
   for production workloads, but at least you can see how to expose and correlate the signals.
@@ -38,10 +37,9 @@ Why does this repo exist?  Well, a few reasons:
   we use – although we do run OTEL Collectors and some Prometheii that remote-write to other places.  So, this also partly exists to ensure
   we have a clear view of all the capabilities offered by the latest incarnations of those services/datasources.
 
-- Lastly, it's a turbulent world out there.  Although I'm not a fully hands-on developer these days, it's fair to say I'm still an
-  active contributor, but much of my work exists on a private github enterprise server.  So, there's no harm in having a public example of
-  _some_ of my experience.  This is not the only example of that, but since I am something of an observability and service-reliabilty
-  zealot, it makes sense to create a body of work that demonstrates that aspect.
+- Lastly, it's a turbulent world out there.  Although I'm not a fully hands-on developer these days, it's fair to say I'm still a very
+  active contributor, but much of my work exists on a private github enterprise server.  So, this is a small public example showing
+  _some_ of my experience, especially as something of an observability and service-reliabilty zealot.
 
 ## Usage
 
@@ -75,6 +73,15 @@ Some other make targets also exist, see the following for more details:
 make help
 ```
 
+## Docs
+
+The documentation is built with [mkdocs](https://www.mkdocs.org/) and [mkdocs-material](https://squidfunk.github.io/mkdocs-material/).
+It can be served as follows:
+
+```plaintext
+mkdocs serve
+```
+
 ## TODO
 
 - [ ] Investigate how to support exemplars from application code – currently it seems the golang SDK doesn't support this, see
@@ -87,6 +94,7 @@ make help
 - [ ] Add github actions for linting and other validation
 - [ ] Improve docs – use mkdocs and github pages to provide a rich description of all the capabilities, with screenshots and stuff .. maybe use [snippets](https://facelessuser.github.io/pymdown-extensions/extensions/snippets/)
 - [ ] Improve [CLI](./cmd/boomer-cli/main.go)
+- [ ] Show usage of influxdb as an event logger, including grafana data links
 
 Maybe:
 
@@ -96,7 +104,8 @@ Maybe:
   shared notion of trace tags and log attributes
 - [ ] Unit tests .. [rod](https://go-rod.github.io/#/)?
 - [ ] Create Traefik to expose loki/tempo GRPC APIs on default port 9095 .. include some [logcli](https://grafana.com/docs/loki/latest/query/logcli/)/[tempo-cli](https://grafana.com/docs/tempo/latest/operations/tempo_cli/#search) scripts?
-- [ ] Use TLS for all endpoints
+- [ ] Multiple docker-compose files highlighting different infra topologies
+- [ ] Prometheus remote-write tuning
 
 Future:
 

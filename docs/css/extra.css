@@ -25,3 +25,21 @@ dl,dt,dd,li,ul {
 .md-typeset dd {
   margin-top: 2px;
 }
+
+div.wrap code {
+  white-space : pre-wrap !important;
+  text-indent: -10px;
+  padding-left: 26px;
+}
+
+div.wrap.highlight code span.linenos {
+  visibility: hidden;
+  width: 0;
+}
+
+div.wrap.highlight code [data-linenos]:before  {
+  visibility: hidden;
+  margin: 0;
+  padding: 0;
+  width: 0;
+}
