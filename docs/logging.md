@@ -24,7 +24,7 @@ nothing too involved with the setup, probably the main thing to highlight is the
 based on these labels, but without adding any other clutter to the log line itself:
 
 ```yaml
---8<-- "docker/promtail.yml:relabel_configs"
+--8<-- "config/promtail.yml:relabel_configs"
 ```
 
 You can see all the source labels available for relabelling like this on the Promtail web interface, <http://localhost:9080/targets>.

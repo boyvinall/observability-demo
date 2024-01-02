@@ -20,7 +20,7 @@ services:
     container_name: promtail
     command: [ "-config.file=/etc/promtail.yml" ]
     volumes:
-      - ./docker/promtail.yml:/etc/promtail.yml
+      - ./config/promtail.yml:/etc/promtail.yml
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
@@ -34,7 +34,7 @@ services:
     # image: grafana/loki:main
     command: [ "-config.file=/etc/loki/loki.yml" ]
     volumes:
-      - ./docker/loki.yml:/etc/loki/loki.yml
+      - ./config/loki.yml:/etc/loki/loki.yml
       - loki-data:/loki # loki user is unable to create top-level directory like /data
     # ports:
     #   - "3100:3100"  # loki
@@ -49,7 +49,7 @@ services:
     # image: grafana/tempo:latest
     command: [ "-config.file=/etc/tempo.yml" ]
     volumes:
-      - ./docker/tempo.yml:/etc/tempo.yml
+      - ./config/tempo.yml:/etc/tempo.yml
       - tempo-data:/tmp/data
     ports:
       - "3200:3200"  # tempo
@@ -68,7 +68,7 @@ services:
       - --enable-feature=exemplar-storage
       - --storage.tsdb.path=/tmp/data
     volumes:
-      - ./docker/prometheus.yml:/etc/prometheus.yml
+      - ./config/prometheus.yml:/etc/prometheus.yml
       # - prometheus-data:/tmp/data # prometheus user is unable to create top-level directory like /data
     ports:
       - "9090:9090" # prometheus
@@ -80,8 +80,8 @@ services:
     image: grafana/grafana:10.2.3
     # image: grafana/grafana:main
     volumes:
-      - ./docker/datasources/:/etc/grafana/provisioning/datasources/
-      - ./docker/dashboards/:/etc/grafana/provisioning/dashboards/
+      - ./config/datasources/:/etc/grafana/provisioning/datasources/
+      - ./config/dashboards/:/etc/grafana/provisioning/dashboards/
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
