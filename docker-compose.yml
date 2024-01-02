@@ -98,7 +98,7 @@ services:
   #
   #---------------------------------------------
 
-  boomer:
+  boomer-server:
     container_name: boomer-server
     image: boomer
     command: [
@@ -112,10 +112,8 @@ services:
       - "2223:2223" # metrics
     labels:
       app: boomer
-    depends_on:
-      - nats
 
-  worker:
+  boomer-worker:
     container_name: boomer-worker
     image: boomer
     command: [
@@ -128,8 +126,6 @@ services:
       - "2224:2223" # metrics
     labels:
       app: boomer
-    depends_on:
-      - nats
 
   nats:
     container_name: nats

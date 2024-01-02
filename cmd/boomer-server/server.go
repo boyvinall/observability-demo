@@ -6,7 +6,6 @@ import (
 	"log/slog"
 	"net"
 
-	"github.com/nats-io/nats.go"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
@@ -63,7 +62,7 @@ func runServer(config serverConfig) error {
 
 	// messaging
 
-	c, err := nats.Connect(config.nats)
+	c, err := setupNatsConnection(config.nats)
 	if err != nil {
 		return err
 	}

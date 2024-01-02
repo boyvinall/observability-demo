@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/nats-io/nats.go"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/boyvinall/observability-demo/pkg/util"
@@ -47,7 +46,7 @@ func runWorker(config workerConfig) error {
 	//--------------------------------------------------
 
 	// messaging
-	c, err := nats.Connect(config.nats)
+	c, err := setupNatsConnection(config.nats)
 	if err != nil {
 		return err
 	}
