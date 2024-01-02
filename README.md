@@ -79,6 +79,7 @@ The documentation is built with [mkdocs](https://www.mkdocs.org/) and [mkdocs-ma
 It can be served as follows:
 
 ```plaintext
+pip3 install -r requirements.txt
 mkdocs serve
 ```
 
