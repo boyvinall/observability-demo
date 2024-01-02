@@ -94,17 +94,16 @@ pkgsite
 
 ## TODO
 
+- [ ] Improve [docs](./docs/)
+- [ ] Improve [CLI](./cmd/boomer-cli/main.go)
+- [ ] Additional/improved provisioned dashboards
+- [ ] Improve `Logs to Metrics` in loki [datasource](./docker/datasources/datasources.yml)
+- [ ] Show usage of influxdb as an event logger, including grafana data links
 - [ ] Investigate how to support exemplars from application code – currently it seems the golang SDK doesn't support this, see
   [Support exemplars in Prometheus exporter](https://github.com/open-telemetry/opentelemetry-go/issues/3163) and
   [Add support for exemplars](https://github.com/open-telemetry/opentelemetry-go/issues/559). However, there is an
   [OTEP describing integration of exemplars with metrics sdk](https://github.com/open-telemetry/oteps/pull/113). Can also investigate
   how tempo pushes generated metrics.
-- [ ] Additional/improved provisioned dashboards
-- [ ] Improve `Logs to Metrics` in loki [datasource](./docker/datasources/datasources.yml)
-- [ ] Add github actions for linting and other validation
-- [ ] Improve docs – use mkdocs and github pages to provide a rich description of all the capabilities, with screenshots and stuff .. maybe use [snippets](https://facelessuser.github.io/pymdown-extensions/extensions/snippets/)
-- [ ] Improve [CLI](./cmd/boomer-cli/main.go)
-- [ ] Show usage of influxdb as an event logger, including grafana data links
 
 Maybe:
 
