@@ -1,0 +1,16 @@
+name: Check Markdown links
+
+on:
+  push:
+  schedule:
+    - cron: "0 9 * * 0"
+
+jobs:
+  markdown-link-check:
+    runs-on: ubuntu-22.04
+    container: ghcr.io/tcort/markdown-link-check:stable
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check links
+        run: |
+          find . -name '*.md' -exec markdown-link-check '{}' --config mlc_config.json -v ';'
