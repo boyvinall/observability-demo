@@ -11,6 +11,17 @@ define PROMPT
 	@echo
 endef
 
+.PHONY: help # Show help
+help:
+	@echo
+	@echo "Usage: make [target...]"
+	@echo
+	@grep -E '^(.PHONY|#####)' Makefile | \
+		sed \
+			-e 's/\.PHONY: \(.*\) # \(.*\)/  \1\t\2/' \
+			-e 's/^#####* \(.*\) #*$$/\n\1:\n/' | \
+		expand -t25
+
 ############# Application targets #############
 
 GRPC_PROTO=\
@@ -44,7 +55,7 @@ generate: \
 	$(call PROMPT,$@)
 	protoc --go_out=paths=source_relative:. $<
 
-.PHONY: clean # Delete build artifacts
+.PHONY: clean # Delete build/generated artifacts
 clean:
 	$(call PROMPT,$@)
 	rm -rf bin
@@ -52,21 +63,9 @@ clean:
 	rm -rf test/*.png
 
 .PHONY: purge # More aggressive clean .. delete anything not in git
-purge:
+purge: clean
 	$(call PROMPT,$@)
 	git clean -fdx
-
-############# Tooling targets #############
-
-.PHONY: download-dependencies # Download go dependencies
-download-dependencies:
-	$(call PROMPT,$@)
-	go mod download -x
-
-.PHONY: install-tools # Install required build tools
-install-tools: download-dependencies
-	$(call PROMPT,$@)
-	@cat tools.go | grep _ | awk -F'"' '{print $$2}' | xargs -tI % go install %
 
 ############# Stack targets #############
 
@@ -85,22 +84,19 @@ run-client:
 	$(call PROMPT,$@)
 	go run ./cmd/boomer-cli/main.go
 
-############# Stack targets #############
-
-.PHONY: browser-tests # Run browser tests
+.PHONY: browser-tests # Run browser tests against the stack
 browser-tests:
 	$(call PROMPT,$@)
 	cd test && go run main.go
 
-#############
+############# Tooling targets #############
 
-.PHONY: help # Show help
-help:
-	@echo
-	@echo "Usage: make [target...]"
-	@echo
-	@grep -E '^(.PHONY|#####)' Makefile | \
-		sed \
-			-e 's/\.PHONY: \(.*\) # \(.*\)/  \1\t\2/' \
-			-e 's/^#####.*$$//' | \
-		expand -t25
+.PHONY: download-dependencies # Download go dependencies
+download-dependencies:
+	$(call PROMPT,$@)
+	go mod download -x
+
+.PHONY: install-tools # Install required build tools
+install-tools: download-dependencies
+	$(call PROMPT,$@)
+	@cat tools.go | grep _ | awk -F'"' '{print $$2}' | xargs -tI % go install %
