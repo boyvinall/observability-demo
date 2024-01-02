@@ -97,7 +97,7 @@ pkgsite
 - [ ] Improve [docs](./docs/)
 - [ ] Improve [CLI](./cmd/boomer-cli/main.go)
 - [ ] Additional/improved provisioned dashboards
-- [ ] Improve `Logs to Metrics` in loki [datasource](./docker/datasources/datasources.yml)
+- [ ] Improve `Logs to Metrics` in loki [datasource](./config/datasources/datasources.yml)
 - [ ] Show usage of influxdb as an event logger, including grafana data links
 - [ ] Investigate how to support exemplars from application code – currently it seems the golang SDK doesn't support this, see
   [Support exemplars in Prometheus exporter](https://github.com/open-telemetry/opentelemetry-go/issues/3163) and

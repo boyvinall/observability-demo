@@ -28,7 +28,7 @@ based on these labels, but without adding any other clutter to the log line itse
 ```
 
 You can see all the source labels available for relabelling like this on the Promtail web interface, <http://localhost:9080/targets>.
-Check the full config [here](https://github.com/boyvinall/observability-demo/blob/main/docker/promtail.yml).
+Check the full config [here](https://github.com/boyvinall/observability-demo/blob/main/config/promtail.yml).
 
 ## Application code
 

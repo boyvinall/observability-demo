@@ -11,6 +11,6 @@ jobs:
     container: ghcr.io/tcort/markdown-link-check:stable
     steps:
       - uses: actions/checkout@v4
-      - name: Check links
-        run: |
-          find . -name '*.md' -exec markdown-link-check '{}' --config mlc_config.json -v ';'
+      - uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          use-verbose-mode: 'yes'

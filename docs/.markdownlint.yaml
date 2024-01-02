@@ -7,3 +7,4 @@ line-length:
 ul-indent:
   indent: 4 # mkdocs uses Python-Markdown, which requires this to be 4
   start_indented: false
+showFound: true

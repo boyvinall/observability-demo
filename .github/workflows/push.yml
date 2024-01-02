@@ -1,13 +1,14 @@
-name: golangci-lint
+name: Push
+
 on:
   push:
 
-permissions:
-  contents: read
-
 jobs:
+
   golangci-lint:
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v4
@@ -17,3 +18,12 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           version: v1.55.2
+
+  markdownlint:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DavidAnson/markdownlint-cli2-action@v14
+        with:
+          globs: 'docs/**/*.md'
+          config: 'docs/.markdownlint.yaml'
